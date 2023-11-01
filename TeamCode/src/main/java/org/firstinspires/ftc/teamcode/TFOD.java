@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.util.Size;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -17,11 +15,11 @@ import java.util.List;
 
 public class TFOD extends LinearOpMode {
 
-    private static final String TFOD_MODEL_FILE = "CenterStage.tflite";
-
     private static final String[] LABELS = {
             "Pixel",
     };
+
+    private static final String TFOD_MODEL_ASSET = "CenterStage.tflite";
 
     private static final boolean USE_WEBCAM = true;
 
@@ -38,6 +36,7 @@ public class TFOD extends LinearOpMode {
         if (opModeIsActive()) {
             while (opModeIsActive()) {
 
+                telemetry.addData("CAM", "WORK");
                 telemetryTfod();
 
                 telemetry.update();
@@ -50,8 +49,7 @@ public class TFOD extends LinearOpMode {
 
     private void initTfod() {
 
-
-        tfod = new TfodProcessor.Builder().setModelFileName(TFOD_MODEL_FILE).setModelLabels(LABELS).build();
+        tfod = new TfodProcessor.Builder().setModelAssetName(TFOD_MODEL_ASSET).setModelLabels(LABELS).build();
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
@@ -71,12 +69,10 @@ public class TFOD extends LinearOpMode {
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
 
-
         for (Recognition recognition : currentRecognitions) {
             double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
             double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
 
-            telemetry.addData(""," ");
             telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
             telemetry.addData("- Position", "%.0f / %.0f", x, y);
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
