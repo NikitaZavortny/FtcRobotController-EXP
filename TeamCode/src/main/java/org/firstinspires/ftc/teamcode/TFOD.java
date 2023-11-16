@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -16,10 +18,11 @@ import java.util.List;
 public class TFOD extends LinearOpMode {
 
     private static final String[] LABELS = {
-            "Pixel",
+            "0",
+            "1",
     };
 
-    private static final String TFOD_MODEL_ASSET = "CenterStage.tflite";
+    private static final String TFOD_MODEL_FILE = "CenterStage_EXP.tflite";
 
     private static final boolean USE_WEBCAM = true;
 
@@ -36,7 +39,6 @@ public class TFOD extends LinearOpMode {
         if (opModeIsActive()) {
             while (opModeIsActive()) {
 
-                telemetry.addData("CAM", "WORK");
                 telemetryTfod();
 
                 telemetry.update();
@@ -49,15 +51,19 @@ public class TFOD extends LinearOpMode {
 
     private void initTfod() {
 
-        tfod = new TfodProcessor.Builder().setModelAssetName(TFOD_MODEL_ASSET).setModelLabels(LABELS).build();
+        tfod = new TfodProcessor.Builder()
+                .setModelAssetName(TFOD_MODEL_FILE)
+                .setModelFileName(TFOD_MODEL_FILE)
+                .setModelLabels(LABELS)
+                .setIsModelQuantized(true)
+                .setIsModelTensorFlow2(true)
+                .build();
 
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
+        builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+        builder.setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.YUY2);
 
         builder.addProcessor(tfod);
 
